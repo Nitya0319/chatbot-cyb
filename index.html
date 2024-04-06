@@ -1,15 +1,27 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Chatbot</title>
-  </head>
   <body>
-    <h1>Chatbot</h1>
-    <form id="chat-form">
-      <input type="text" id="question" name="question" placeholder="Enter your question here...">
-      <button type="submit">Send</button>
-    </form>
-    <div id="answer"></div>
-    <script src="script.js"></script>
+    <input type="text" id="question" placeholder="Enter your question">
+    <button onclick="sendFunction()">Submit</button>
+    <p id="answer"></p>
+
+    <script>
+      async function sendFunction() {
+        const question = document.getElementById("question").value;
+
+        const input = {
+          prompt: "A llama walks into a bar. " + question,
+          temperature: 0.95,
+          max_new_tokens: 500
+        };
+
+        const Replicate = await import('replicate');
+        const replicate = new Replicate();
+
+        for await (const event of replicate.stream("meta/llama-2-7b", { input })) {
+          document.getElementById("answer").innerHTML = event;
+        }
+      }
+    </script>
   </body>
 </html>
