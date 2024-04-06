@@ -1,33 +1,25 @@
-const chatHistory = document.getElementById('chat-history');
-const userInput = document.getElementById('user-input');
-const sendBtn = document.getElementById('send-btn');
+const form = document.getElementById('chat-form');
+const questionInput = document.getElementById('question');
+const answerDiv = document.getElementById('answer');
 
-sendBtn.addEventListener('click', () => {
-  const userMessage = userInput.value;
-  if (userMessage.trim()) {
-    renderChatBubble(userMessage, 'user');
-    fetch('http://localhost:5000/chat', {
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const question = questionInput.value;
+  sendQuestion(question);
+});
+
+async function sendQuestion(question) {
+  try {
+    const response = await fetch('/ask', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ message: userMessage })
-    })
-   .then(response => response.json())
-   .then(data => {
-      renderChatBubble(data.message, 'assistant');
-    })
-   .catch(error => {
-      console.error('Error:', error);
+      body: JSON.stringify({ question })
     });
-    userInput.value = '';
+    const data = await response.json();
+    answerDiv.textContent = data.answer;
+  } catch (error) {
+    console.error(error);
   }
-});
-
-function renderChatBubble(message, role) {
-  const chatBubble = document.createElement('li');
-  chatBubble.classList.add('chat-bubble', role);
-  chatBubble.textContent = message;
-  chatHistory.appendChild(chatBubble);
-  chatHistory.scrollTop = chatHistory.scrollHeight;
 }
