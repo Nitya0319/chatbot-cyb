@@ -17,8 +17,14 @@ async function sendQuestion(question) {
       },
       body: JSON.stringify({ question })
     });
-    const data = await response.json();
-    answerDiv.textContent = data.answer;
+
+    // Check if the response is in JSON format
+    if (response.headers.get('Content-Type').includes('application/json')) {
+      const data = await response.json();
+      answerDiv.textContent = data.answer;
+    } else {
+      console.error('The server did not return a JSON response.');
+    }
   } catch (error) {
     console.error(error);
   }
